@@ -23,7 +23,7 @@ corner.CornerRadius = UDim.new(0, 12)
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1, -20, 0, 40)
 title.Position = UDim2.new(0, 10, 0, 5)
-title.Text = "Auto farm chest - Made by alexrsyt"
+title.Text = "Create - Made by Bạn"
 title.BackgroundTransparency = 1
 title.TextColor3 = Color3.fromRGB(200, 200, 200)
 title.Font = Enum.Font.GothamBold
@@ -81,6 +81,27 @@ showButton.Visible = false
 local showCorner = Instance.new("UICorner", showButton)
 showCorner.CornerRadius = UDim.new(1, 0)
 
+-- Thêm tính năng kéo cho nút hình tròn
+local dragging = false
+local dragInput, dragStart, startPos
+
+showButton.MouseButton1Down:Connect(function(input)
+    dragging = true
+    dragStart = input.Position
+    startPos = showButton.Position
+    input.Changed:Connect(function()
+        if dragging then
+            local delta = input.Position - dragStart
+            showButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+end)
+
+game:GetService("UserInputService").InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
 -- Animation Tween
 local tween = game:GetService("TweenService")
 local farming = false
@@ -97,13 +118,10 @@ end
 spawn(function()
     while true do
         if farming then
-            for i, v in pairs(game:GetService("Workspace"):GetDescendants()) do
-                if v:IsA("Tool") and v.Name == "Chest" then
-                    if v:FindFirstChild("TouchInterest") then
-                        teleportTo(v.Position + Vector3.new(0, 3, 0))
-                        wait(0.5)
-                    end
-                elseif v:IsA("Model") and string.find(v.Name, "Chest") then
+            -- Sửa phần tìm kiếm Chest
+            local chestModels = game.Workspace:WaitForChild("ChestModels")
+            for i, v in pairs(chestModels:GetChildren()) do
+                if v:IsA("Model") and string.find(v.Name, "Chest") then
                     if v:FindFirstChild("HumanoidRootPart") then
                         teleportTo(v.HumanoidRootPart.Position + Vector3.new(0, 3, 0))
                         wait(0.5)
